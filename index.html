@@ -19,10 +19,13 @@
         <!-- 入力エリア -->
         <section class="card">
           <h2>タスク文章入力</h2>
-          <textarea
-            id="inputText"
-            placeholder="日付、タスク、詳細の順に記入してください"
-          ></textarea>
+          <div class="textarea-wrapper">
+            <textarea id="inputText"></textarea>
+            <div id="inputPlaceholder" class="textarea-placeholder">
+              Copilotでまとめた文章を貼り付けてください
+            </div>
+          </div>
+
           <button id="parseButton">解析してタスクに追加</button>
         </section>
 

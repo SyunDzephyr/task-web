@@ -1,7 +1,7 @@
 /* 全体 */
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background-color: #f2f2f7;
   color: #111827;
   font-size: 16px;
@@ -45,8 +45,12 @@ body {
   font-size: 18px;
 }
 
-/* 入力エリア */
-textarea {
+/* textarea の擬似 placeholder 用ラッパー */
+.textarea-wrapper {
+  position: relative;
+}
+
+.textarea-wrapper textarea {
   width: 100%;
   min-height: 110px;
   border-radius: 12px;
@@ -55,6 +59,24 @@ textarea {
   font-size: 14px;
   resize: vertical;
   box-sizing: border-box;
+}
+
+/* 入力中も表示される placeholder */
+.textarea-placeholder {
+  position: absolute;
+  top: 8px; /* 初期位置（通常の placeholder と同じ） */
+  left: 12px;
+  font-size: 14px;
+  color: #9ca3af;
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+/* 入力が始まったら placeholder を下に移動 */
+.textarea-wrapper textarea:not(:placeholder-shown) + .textarea-placeholder,
+.textarea-wrapper textarea:focus + .textarea-placeholder {
+  top: 36px; /* ← 1行下に移動 */
+  opacity: 0.6;
 }
 
 textarea:focus {
@@ -249,8 +271,8 @@ button.danger:hover {
   font-size: 12px;
 }
 
-.task-done input[type="checkbox"],
-.task-select input[type="checkbox"] {
+.task-done input[type='checkbox'],
+.task-select input[type='checkbox'] {
   width: 16px;
   height: 16px;
 }
