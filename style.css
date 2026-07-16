@@ -1,0 +1,200 @@
+/* 全体 */
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background-color: #f2f2f7; /* iOSっぽいグレー */
+  color: #111827;
+}
+
+.app {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+/* ヘッダー */
+.app-header {
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.app-header p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* カード */
+.card {
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.03);
+}
+
+.card h2 {
+  margin: 0 0 8px;
+  font-size: 16px;
+}
+
+/* 入力エリア */
+textarea {
+  width: 100%;
+  min-height: 100px;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  padding: 8px;
+  font-size: 13px;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: #007aff;
+  box-shadow: 0 0 0 1px rgba(0, 122, 255, 0.3);
+}
+
+/* ボタン */
+button {
+  margin-top: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: none;
+  background-color: #007aff;
+  color: #ffffff;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #005fcc;
+}
+
+/* カテゴリ管理 */
+.category-input-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.category-input-row input {
+  flex: 1;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  padding: 6px 10px;
+  font-size: 13px;
+  box-sizing: border-box;
+}
+
+.category-input-row input:focus {
+  outline: none;
+  border-color: #007aff;
+  box-shadow: 0 0 0 1px rgba(0, 122, 255, 0.3);
+}
+
+.category-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.category-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background-color: #f3f4f6;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.category-item button {
+  margin-top: 0;
+  background-color: #ef4444;
+  font-size: 11px;
+  padding: 4px 8px;
+}
+
+.category-item button:hover {
+  background-color: #b91c1c;
+}
+
+/* タスク一覧 */
+.task-date-group {
+  margin-bottom: 12px;
+}
+
+.task-date-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #4b5563;
+  margin-bottom: 4px;
+}
+
+.task-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 8px 10px;
+  margin-bottom: 6px;
+  border: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.task-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.task-title {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.task-meta {
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.task-memo {
+  font-size: 12px;
+  color: #374151;
+}
+
+.task-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.task-category {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background-color: #e5f2ff;
+  color: #1d4ed8;
+}
+
+.task-done {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+}
+
+.task-done input[type='checkbox'] {
+  width: 14px;
+  height: 14px;
+}
