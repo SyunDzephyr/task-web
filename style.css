@@ -70,13 +70,14 @@ body {
   color: #9ca3af;
   pointer-events: none;
   opacity: 0.7;
+  transition: all 0.2s ease;
 }
 
 /* 入力が始まったら placeholder を下に移動 */
-.textarea-wrapper textarea:not(:placeholder-shown) + .textarea-placeholder,
-.textarea-wrapper textarea:focus + .textarea-placeholder {
-  top: 36px; /* ← 1行下に移動 */
+.textarea-wrapper textarea:not(:placeholder-shown) + .textarea-placeholder {
+  top: 36px; /* ← 1行下へ移動 */
   opacity: 0.6;
+  transition: all 0.2s ease;
 }
 
 textarea:focus {

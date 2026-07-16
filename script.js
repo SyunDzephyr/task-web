@@ -184,6 +184,16 @@ function getTimeValue(task) {
   const m = parseInt(match[2], 10);
   return h * 60 + m;
 }
+const inputText = document.getElementById('inputText');
+const inputPlaceholder = document.getElementById('inputPlaceholder');
+
+inputText.addEventListener('input', () => {
+  if (inputText.value.trim() === '') {
+    inputPlaceholder.style.top = '8px'; // 初期位置
+  } else {
+    inputPlaceholder.style.top = '36px'; // 1行下
+  }
+});
 
 // ---- 文章 → タスク解析 ----
 function parseTasks(text, categories) {
