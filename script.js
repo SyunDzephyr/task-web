@@ -19,6 +19,28 @@ function loadCategories() {
 let tasks = loadTasks();
 let categories = loadCategories();
 
+// ---- タイトル＋メモ抽出（精度アップ）----
+function extractTitleAndMemo(text) {
+  const nounMatch = text.match(
+    /([^\s]+さん|[^\s]+店|[^\s]+大学|[^\s]+作業|[^\s]+面談|[^\s]+手続き)/,
+  );
+
+  if (nounMatch) {
+    const title = nounMatch[0];
+    const memo = text.replace(title, '').trim();
+    return { title, memo };
+  }
+
+  if (text.length <= 15) {
+    return { title: text || '(タイトル未設定)', memo: '' };
+  }
+
+  return {
+    title: text.slice(0, 15) + '…',
+    memo: text.slice(15),
+  };
+}
+
 // ---- 文章 → タスク解析 ----
 function parseTasks(text, categories) {
   const lines = text
@@ -30,28 +52,27 @@ function parseTasks(text, categories) {
     const dateMatch = line.match(/(\d{1,2}\/\d{1,2})/);
     const timeMatch = line.match(/(\d{1,2}:\d{2}〜\d{1,2}:\d{2})/);
 
-    const date = dateMatch ? dateMatch[0] : null;
-    const time = timeMatch ? timeMatch[0] : null;
+    const date = dateMatch ? dateMatch[0] : '未設定';
+    const time = timeMatch ? timeMatch[0] : '';
 
     const cleaned = line
-      .replace(date ?? '', '')
-      .replace(time ?? '', '')
+      .replace(dateMatch?.[0] ?? '', '')
+      .replace(timeMatch?.[0] ?? '', '')
       .trim();
 
-    // タイトル＋メモ（最初の語をタイトル、それ以降をメモに）
-    const [title, ...memoParts] = cleaned.split(' ');
-    const memo = memoParts.join(' ');
+    const { title, memo } = extractTitleAndMemo(cleaned);
 
     const category = categories.find((cat) => line.includes(cat)) || 'その他';
 
     return {
       id: crypto.randomUUID(),
-      title: title || '(タイトル未設定)',
+      title,
       memo,
-      date: date || '未設定',
-      time: time || '',
+      date,
+      time,
       category,
       done: false,
+      selected: false,
     };
   });
 }
@@ -82,19 +103,45 @@ function renderCategories() {
   });
 }
 
+// ---- メモ編集コンポーネント ----
+function createMemoElement(task) {
+  const memoDiv = document.createElement('div');
+  memoDiv.className = 'task-memo';
+  memoDiv.textContent = task.memo || '（メモを追加）';
+
+  memoDiv.addEventListener('click', () => {
+    const textarea = document.createElement('textarea');
+    textarea.value = task.memo;
+    textarea.style.width = '100%';
+    textarea.style.fontSize = '14px';
+    textarea.style.borderRadius = '8px';
+    textarea.style.marginTop = '4px';
+
+    memoDiv.replaceWith(textarea);
+
+    textarea.addEventListener('blur', () => {
+      task.memo = textarea.value.trim();
+      saveTasks(tasks);
+      renderTasks();
+    });
+
+    textarea.focus();
+  });
+
+  return memoDiv;
+}
+
 // ---- タスク表示 ----
 function renderTasks() {
   const container = document.getElementById('taskList');
   container.innerHTML = '';
 
-  // 日付ごとにグループ化
   const grouped = {};
   tasks.forEach((task) => {
     if (!grouped[task.date]) grouped[task.date] = [];
     grouped[task.date].push(task);
   });
 
-  // 日付順に並べる（文字列ソート）
   const dates = Object.keys(grouped).sort();
 
   dates.forEach((date) => {
@@ -110,6 +157,9 @@ function renderTasks() {
     grouped[date].forEach((task) => {
       const card = document.createElement('div');
       card.className = 'task-card';
+      if (task.selected) {
+        card.classList.add('selected');
+      }
 
       const header = document.createElement('div');
       header.className = 'task-header';
@@ -125,9 +175,7 @@ function renderTasks() {
       header.appendChild(titleSpan);
       header.appendChild(meta);
 
-      const memoDiv = document.createElement('div');
-      memoDiv.className = 'task-memo';
-      memoDiv.textContent = task.memo;
+      const memoDiv = createMemoElement(task);
 
       const footer = document.createElement('div');
       footer.className = 'task-footer';
@@ -136,25 +184,61 @@ function renderTasks() {
       categorySpan.className = 'task-category';
       categorySpan.textContent = task.category;
 
-      const doneDiv = document.createElement('label');
-      doneDiv.className = 'task-done';
+      const rightControls = document.createElement('div');
+      rightControls.style.display = 'flex';
+      rightControls.style.alignItems = 'center';
+      rightControls.style.gap = '8px';
 
-      const checkbox = document.createElement('input');
-      checkbox.type = 'checkbox';
-      checkbox.checked = task.done;
-      checkbox.addEventListener('change', () => {
-        task.done = checkbox.checked;
+      const selectLabel = document.createElement('label');
+      selectLabel.className = 'task-select';
+
+      const selectCheckbox = document.createElement('input');
+      selectCheckbox.type = 'checkbox';
+      selectCheckbox.checked = task.selected;
+      selectCheckbox.addEventListener('change', () => {
+        task.selected = selectCheckbox.checked;
+        saveTasks(tasks);
+        renderTasks();
+      });
+
+      const selectText = document.createElement('span');
+      selectText.textContent = '選択';
+
+      selectLabel.appendChild(selectCheckbox);
+      selectLabel.appendChild(selectText);
+
+      const doneLabel = document.createElement('label');
+      doneLabel.className = 'task-done';
+
+      const doneCheckbox = document.createElement('input');
+      doneCheckbox.type = 'checkbox';
+      doneCheckbox.checked = task.done;
+      doneCheckbox.addEventListener('change', () => {
+        task.done = doneCheckbox.checked;
         saveTasks(tasks);
       });
 
       const doneText = document.createElement('span');
       doneText.textContent = '完了';
 
-      doneDiv.appendChild(checkbox);
-      doneDiv.appendChild(doneText);
+      doneLabel.appendChild(doneCheckbox);
+      doneLabel.appendChild(doneText);
+
+      const deleteButton = document.createElement('button');
+      deleteButton.className = 'task-delete-button';
+      deleteButton.textContent = '削除';
+      deleteButton.addEventListener('click', () => {
+        tasks = tasks.filter((t) => t.id !== task.id);
+        saveTasks(tasks);
+        renderTasks();
+      });
+
+      rightControls.appendChild(selectLabel);
+      rightControls.appendChild(doneLabel);
+      rightControls.appendChild(deleteButton);
 
       footer.appendChild(categorySpan);
-      footer.appendChild(doneDiv);
+      footer.appendChild(rightControls);
 
       card.appendChild(header);
       card.appendChild(memoDiv);
@@ -174,11 +258,13 @@ window.addEventListener('DOMContentLoaded', () => {
   const newCategoryInput = document.getElementById('newCategoryInput');
   const addCategoryButton = document.getElementById('addCategoryButton');
 
-  // 初期表示
+  const selectAllButton = document.getElementById('selectAllButton');
+  const unselectAllButton = document.getElementById('unselectAllButton');
+  const deleteSelectedButton = document.getElementById('deleteSelectedButton');
+
   renderCategories();
   renderTasks();
 
-  // 解析ボタン
   parseButton.addEventListener('click', () => {
     const text = inputText.value.trim();
     if (!text) return;
@@ -191,7 +277,6 @@ window.addEventListener('DOMContentLoaded', () => {
     inputText.value = '';
   });
 
-  // カテゴリ追加
   addCategoryButton.addEventListener('click', () => {
     const name = newCategoryInput.value.trim();
     if (!name) return;
@@ -201,5 +286,23 @@ window.addEventListener('DOMContentLoaded', () => {
       renderCategories();
     }
     newCategoryInput.value = '';
+  });
+
+  selectAllButton.addEventListener('click', () => {
+    tasks.forEach((t) => (t.selected = true));
+    saveTasks(tasks);
+    renderTasks();
+  });
+
+  unselectAllButton.addEventListener('click', () => {
+    tasks.forEach((t) => (t.selected = false));
+    saveTasks(tasks);
+    renderTasks();
+  });
+
+  deleteSelectedButton.addEventListener('click', () => {
+    tasks = tasks.filter((t) => !t.selected);
+    saveTasks(tasks);
+    renderTasks();
   });
 });

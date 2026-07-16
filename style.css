@@ -2,8 +2,9 @@
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background-color: #f2f2f7; /* iOSっぽいグレー */
+  background-color: #f2f2f7;
   color: #111827;
+  font-size: 16px;
 }
 
 .app {
@@ -20,13 +21,13 @@ body {
 
 .app-header h1 {
   margin: 0;
-  font-size: 24px;
+  font-size: 26px;
   font-weight: 700;
 }
 
 .app-header p {
   margin: 4px 0 0;
-  font-size: 13px;
+  font-size: 14px;
   color: #6b7280;
 }
 
@@ -41,17 +42,17 @@ body {
 
 .card h2 {
   margin: 0 0 8px;
-  font-size: 16px;
+  font-size: 18px;
 }
 
 /* 入力エリア */
 textarea {
   width: 100%;
-  min-height: 100px;
+  min-height: 110px;
   border-radius: 12px;
   border: 1px solid #d1d5db;
   padding: 8px;
-  font-size: 13px;
+  font-size: 14px;
   resize: vertical;
   box-sizing: border-box;
 }
@@ -65,17 +66,33 @@ textarea:focus {
 /* ボタン */
 button {
   margin-top: 8px;
-  padding: 8px 12px;
+  padding: 8px 14px;
   border-radius: 999px;
   border: none;
   background-color: #007aff;
   color: #ffffff;
-  font-size: 13px;
+  font-size: 14px;
   cursor: pointer;
 }
 
 button:hover {
   background-color: #005fcc;
+}
+
+button.danger {
+  background-color: #ef4444;
+}
+
+button.danger:hover {
+  background-color: #b91c1c;
+}
+
+/* タスクツールバー */
+.task-toolbar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
 }
 
 /* カテゴリ管理 */
@@ -90,7 +107,7 @@ button:hover {
   border-radius: 999px;
   border: 1px solid #d1d5db;
   padding: 6px 10px;
-  font-size: 13px;
+  font-size: 14px;
   box-sizing: border-box;
 }
 
@@ -113,19 +130,14 @@ button:hover {
   padding: 6px 10px;
   border-radius: 999px;
   background-color: #f3f4f6;
-  font-size: 13px;
+  font-size: 14px;
   margin-bottom: 4px;
 }
 
 .category-item button {
   margin-top: 0;
-  background-color: #ef4444;
-  font-size: 11px;
+  font-size: 12px;
   padding: 4px 8px;
-}
-
-.category-item button:hover {
-  background-color: #b91c1c;
 }
 
 /* タスク一覧 */
@@ -134,7 +146,7 @@ button:hover {
 }
 
 .task-date-title {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   color: #4b5563;
   margin-bottom: 4px;
@@ -151,25 +163,32 @@ button:hover {
   gap: 4px;
 }
 
+.task-card.selected {
+  border-color: #007aff;
+  box-shadow: 0 0 0 1px rgba(0, 122, 255, 0.3);
+}
+
 .task-header {
   display: flex;
+  justify-content: space-between;
   align-items: center;
   gap: 8px;
 }
 
 .task-title {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
 }
 
 .task-meta {
-  font-size: 11px;
+  font-size: 12px;
   color: #6b7280;
 }
 
 .task-memo {
-  font-size: 12px;
+  font-size: 14px;
   color: #374151;
+  cursor: pointer;
 }
 
 .task-footer {
@@ -180,21 +199,39 @@ button:hover {
 }
 
 .task-category {
-  font-size: 11px;
+  font-size: 12px;
   padding: 2px 8px;
   border-radius: 999px;
   background-color: #e5f2ff;
   color: #1d4ed8;
 }
 
-.task-done {
+.task-done,
+.task-select {
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: 11px;
+  font-size: 12px;
 }
 
-.task-done input[type='checkbox'] {
-  width: 14px;
-  height: 14px;
+.task-done input[type='checkbox'],
+.task-select input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+}
+
+/* 削除ボタン（カード内） */
+.task-delete-button {
+  margin-top: 0;
+  padding: 4px 8px;
+  font-size: 12px;
+  border-radius: 999px;
+  background-color: #ef4444;
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+}
+
+.task-delete-button:hover {
+  background-color: #b91c1c;
 }

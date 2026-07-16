@@ -41,6 +41,15 @@
         <!-- タスク一覧 -->
         <section class="card">
           <h2>タスク一覧</h2>
+
+          <div class="task-toolbar">
+            <button id="selectAllButton">全選択</button>
+            <button id="unselectAllButton">選択解除</button>
+            <button id="deleteSelectedButton" class="danger">
+              選択したタスクを削除
+            </button>
+          </div>
+
           <div id="taskList"></div>
         </section>
       </main>
