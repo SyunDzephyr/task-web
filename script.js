@@ -18,8 +18,9 @@ function loadCategories() {
 // ---- グローバル状態 ----
 let tasks = loadTasks();
 let categories = loadCategories();
+let searchQuery = '';
 
-// ---- タイトル＋メモ抽出（精度アップ）----
+// ---- タイトル＋メモ抽出 ----
 function extractTitleAndMemo(text) {
   const nounMatch = text.match(
     /([^\s]+さん|[^\s]+店|[^\s]+大学|[^\s]+作業|[^\s]+面談|[^\s]+手続き)/,
@@ -39,6 +40,16 @@ function extractTitleAndMemo(text) {
     title: text.slice(0, 15) + '…',
     memo: text.slice(15),
   };
+}
+
+// ---- 時間を数値に変換（ソート用）----
+function getTimeValue(task) {
+  if (!task.time) return 999999; // 時間未設定は最後に
+  const match = task.time.match(/(\d{1,2}):(\d{2})/);
+  if (!match) return 999999;
+  const h = parseInt(match[1], 10);
+  const m = parseInt(match[2], 10);
+  return h * 60 + m;
 }
 
 // ---- 文章 → タスク解析 ----
@@ -103,7 +114,7 @@ function renderCategories() {
   });
 }
 
-// ---- メモ編集コンポーネント ----
+// ---- メモ編集 ----
 function createMemoElement(task) {
   const memoDiv = document.createElement('div');
   memoDiv.className = 'task-memo';
@@ -131,13 +142,35 @@ function createMemoElement(task) {
   return memoDiv;
 }
 
+// ---- 日付編集 ----
+function editDateForGroup(date) {
+  const newDate = prompt(
+    '新しい日付を入力してください（例：7/20）',
+    date === '未設定' ? '' : date,
+  );
+  if (!newDate) return;
+  tasks.forEach((t) => {
+    if (t.date === date) {
+      t.date = newDate;
+    }
+  });
+  saveTasks(tasks);
+  renderTasks();
+}
+
 // ---- タスク表示 ----
 function renderTasks() {
   const container = document.getElementById('taskList');
   container.innerHTML = '';
 
+  // 検索フィルタ
+  const filteredTasks = tasks.filter((t) =>
+    t.title.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
+
+  // 日付ごとにグループ化
   const grouped = {};
-  tasks.forEach((task) => {
+  filteredTasks.forEach((task) => {
     if (!grouped[task.date]) grouped[task.date] = [];
     grouped[task.date].push(task);
   });
@@ -148,13 +181,31 @@ function renderTasks() {
     const groupDiv = document.createElement('div');
     groupDiv.className = 'task-date-group';
 
+    const titleRow = document.createElement('div');
+    titleRow.className = 'task-date-title-row';
+
     const title = document.createElement('div');
     title.className = 'task-date-title';
     title.textContent = date === '未設定' ? '日付未設定' : date;
 
-    groupDiv.appendChild(title);
+    const editButton = document.createElement('button');
+    editButton.className = 'task-date-edit-button';
+    editButton.textContent = '日付編集';
+    editButton.addEventListener('click', () => {
+      editDateForGroup(date);
+    });
 
-    grouped[date].forEach((task) => {
+    titleRow.appendChild(title);
+    titleRow.appendChild(editButton);
+
+    groupDiv.appendChild(titleRow);
+
+    // 時間順にソート
+    const sortedTasks = grouped[date].slice().sort((a, b) => {
+      return getTimeValue(a) - getTimeValue(b);
+    });
+
+    sortedTasks.forEach((task) => {
       const card = document.createElement('div');
       card.className = 'task-card';
       if (task.selected) {
@@ -261,6 +312,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const selectAllButton = document.getElementById('selectAllButton');
   const unselectAllButton = document.getElementById('unselectAllButton');
   const deleteSelectedButton = document.getElementById('deleteSelectedButton');
+  const searchInput = document.getElementById('searchInput');
 
   renderCategories();
   renderTasks();
@@ -305,4 +357,18 @@ window.addEventListener('DOMContentLoaded', () => {
     saveTasks(tasks);
     renderTasks();
   });
+
+  searchInput.addEventListener('input', () => {
+    searchQuery = searchInput.value.trim();
+    renderTasks();
+  });
+
+  // PWA用 Service Worker 登録
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker
+      .register('sw.js')
+      .catch((err) =>
+        console.error('Service Worker registration failed:', err),
+      );
+  }
 });
